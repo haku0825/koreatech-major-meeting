@@ -1,8 +1,10 @@
 package haku.kmm.org.koreatechmajormeeting.domain.user.service;
 
 import haku.kmm.org.koreatechmajormeeting.domain.user.entity.EmailVerification;
+import haku.kmm.org.koreatechmajormeeting.domain.user.entity.User;
 import haku.kmm.org.koreatechmajormeeting.domain.user.notification.MailService;
 import haku.kmm.org.koreatechmajormeeting.domain.user.repository.EmailVerificationRepository;
+import haku.kmm.org.koreatechmajormeeting.domain.user.repository.UserRepository;
 import haku.kmm.org.koreatechmajormeeting.global.exception.BusinessException;
 import haku.kmm.org.koreatechmajormeeting.global.exception.ErrorCode;
 import java.time.LocalDateTime;
@@ -22,11 +24,12 @@ public class UserVerificationService {
         Pattern.compile("^[A-Za-z0-9._%+-]+@koreatech\\.ac\\.kr$");
 
     private final EmailVerificationRepository emailVerificationRepository;
+    private final UserRepository userRepository;
     private final MailService mailService;
 
     @Transactional
     public void sendVerificationCode(String email) {
-        validateKoreatechEmail(email);
+        assertKoreatechEmail(email);
         String code = generateCode();
         LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(VERIFICATION_EXPIRATION_MINUTES);
 
@@ -49,7 +52,7 @@ public class UserVerificationService {
 
     @Transactional
     public void verifyCode(String email, String code) {
-        validateKoreatechEmail(email);
+        assertKoreatechEmail(email);
 
         EmailVerification verification = emailVerificationRepository.findByEmail(email)
             .orElseThrow(() -> new BusinessException(ErrorCode.EMAIL_CODE_NOT_FOUND));
@@ -63,28 +66,26 @@ public class UserVerificationService {
         }
 
         verification.markVerified();
+        userRepository.findByEmail(email).ifPresent(User::markEmailVerified);
     }
 
-    @Transactional(readOnly = true)
-    public void assertVerifiedForSignup(String email) {
-        validateKoreatechEmail(email);
-
-        EmailVerification verification = emailVerificationRepository.findByEmail(email)
-            .orElseThrow(() -> new BusinessException(ErrorCode.EMAIL_NOT_VERIFIED));
-
-        if (!verification.isVerified() || verification.isExpired()) {
-            throw new BusinessException(ErrorCode.EMAIL_NOT_VERIFIED);
+    public void assertKoreatechEmail(String email) {
+        if (!KOREATECH_EMAIL_PATTERN.matcher(email).matches()) {
+            throw new BusinessException(ErrorCode.INVALID_KOREATECH_EMAIL);
         }
     }
 
-    @Transactional
-    public void clearVerification(String email) {
-        emailVerificationRepository.deleteByEmail(email);
-    }
+    @Transactional(readOnly = true)
+    public void assertFullyVerified(Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-    private void validateKoreatechEmail(String email) {
-        if (!KOREATECH_EMAIL_PATTERN.matcher(email).matches()) {
-            throw new BusinessException(ErrorCode.INVALID_KOREATECH_EMAIL);
+        if (!user.isEmailVerified()) {
+            throw new BusinessException(ErrorCode.EMAIL_NOT_VERIFIED_FOR_LOGIN);
+        }
+
+        if (!user.isStudentCardVerified()) {
+            throw new BusinessException(ErrorCode.STUDENT_CARD_NOT_VERIFIED_FOR_LOGIN);
         }
     }
 

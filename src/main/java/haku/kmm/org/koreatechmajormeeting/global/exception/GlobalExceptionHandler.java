@@ -8,6 +8,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.MultipartException;
 
 @Slf4j
 @RestControllerAdvice
@@ -35,6 +37,33 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleHttpMessageNotReadableException(
         HttpMessageNotReadableException e
     ) {
+        return ResponseEntity.status(ErrorCode.INVALID_REQUEST.getStatus())
+            .body(ApiResponse.fail(ErrorCode.INVALID_REQUEST.getCode(), ErrorCode.INVALID_REQUEST.getMessage()));
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMaxUploadSizeExceededException(
+        MaxUploadSizeExceededException e
+    ) {
+        return ResponseEntity.status(ErrorCode.STUDENT_CARD_FILE_TOO_LARGE.getStatus())
+            .body(ApiResponse.fail(
+                ErrorCode.STUDENT_CARD_FILE_TOO_LARGE.getCode(),
+                ErrorCode.STUDENT_CARD_FILE_TOO_LARGE.getMessage()
+            ));
+    }
+
+    @ExceptionHandler(MultipartException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMultipartException(
+        MultipartException e
+    ) {
+        String message = e.getMessage();
+        if (message != null && message.toLowerCase().contains("size")) {
+            return ResponseEntity.status(ErrorCode.STUDENT_CARD_FILE_TOO_LARGE.getStatus())
+                .body(ApiResponse.fail(
+                    ErrorCode.STUDENT_CARD_FILE_TOO_LARGE.getCode(),
+                    ErrorCode.STUDENT_CARD_FILE_TOO_LARGE.getMessage()
+                ));
+        }
         return ResponseEntity.status(ErrorCode.INVALID_REQUEST.getStatus())
             .body(ApiResponse.fail(ErrorCode.INVALID_REQUEST.getCode(), ErrorCode.INVALID_REQUEST.getMessage()));
     }

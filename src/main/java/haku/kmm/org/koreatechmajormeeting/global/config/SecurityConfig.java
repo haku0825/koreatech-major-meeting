@@ -26,7 +26,22 @@ public class SecurityConfig {
                 session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/auth/**", "/h2-console/**").permitAll()
+                .requestMatchers(
+                    "/",
+                    "/index.html",
+                    "/feed.html",
+                    "/signup.html",
+                    "/account.html",
+                    "/chat.html",
+                    "/chat-room.html",
+                    "/db-viewer.html",
+                    "/admin-student-card.html",
+                    "/assets/**",
+                    "/api/v1/auth/**",
+                    "/api/v1/dev/**",
+                    "/h2-console/**"
+                ).permitAll()
+                .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
             .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))

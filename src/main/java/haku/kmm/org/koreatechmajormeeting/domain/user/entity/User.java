@@ -42,8 +42,14 @@ public class User {
     @Column(nullable = false, length = 30)
     private String name;
 
+    @Column(length = 30)
+    private String nickname;
+
     @Column(nullable = false, length = 20)
     private String studentNumber;
+
+    @Column(nullable = false, length = 4)
+    private String birthYear;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 80)
@@ -52,6 +58,12 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private UserRole role;
+
+    @Column(nullable = false)
+    private boolean emailVerified;
+
+    @Column(nullable = false)
+    private boolean studentCardVerified;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -64,16 +76,66 @@ public class User {
         String email,
         String password,
         String name,
+        String nickname,
         String studentNumber,
+        String birthYear,
         Major major,
-        UserRole role
+        UserRole role,
+        boolean emailVerified,
+        boolean studentCardVerified
     ) {
         this.email = email;
         this.password = password;
         this.name = name;
+        this.nickname = nickname;
         this.studentNumber = studentNumber;
+        this.birthYear = birthYear;
         this.major = major;
         this.role = role == null ? UserRole.USER : role;
+        this.emailVerified = emailVerified;
+        this.studentCardVerified = studentCardVerified;
+    }
+
+    public void markEmailVerified() {
+        this.emailVerified = true;
+    }
+
+    public void markEmailUnverified() {
+        this.emailVerified = false;
+    }
+
+    public void markStudentCardVerified() {
+        this.studentCardVerified = true;
+    }
+
+    public void markStudentCardUnverified() {
+        this.studentCardVerified = false;
+    }
+
+    public void updateProfile(String name, Major major) {
+        this.name = name;
+        this.major = major;
+    }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void updateBirthYear(String birthYear) {
+        this.birthYear = birthYear;
+    }
+
+    public void updateEmail(String email) {
+        this.email = email;
+        this.emailVerified = false;
+    }
+
+    public void updatePassword(String encodedPassword) {
+        this.password = encodedPassword;
+    }
+
+    public void updateRole(UserRole role) {
+        this.role = role;
     }
 
     @PrePersist
