@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KOREATECH MAJOR MEETING</title>
+  <style>
+    @import url("https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css");
+
+    :root {
+      --bg: #f2f7fb;
+      --ink: #0f2431;
+      --muted: #4e6574;
+      --line: #cbdae4;
+      --panel: #ffffff;
+      --brand: #00588a;
+      --brand-2: #007f9f;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+      --shadow: 0 16px 36px rgba(3, 38, 58, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      color: var(--ink);
+      font-family: "SUIT", "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+      background:
+        radial-gradient(circle at 12% 8%, #d8ecff 0%, transparent 35%),
+        radial-gradient(circle at 88% 14%, #d7f0e8 0%, transparent 38%),
+        var(--bg);
+    }
+
+    .app {
+      width: min(1100px, 100%);
+      margin: 0 auto;
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+    }
+
+    .top {
+      padding: 16px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .top > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      font-weight: 900;
+      font-size: 18px;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: #174d6b;
+      border: 1px solid #c4d4de;
+      border-radius: 999px;
+      padding: 7px 12px;
+      background: #f6fbff;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(24px, 3vw, 36px);
+      letter-spacing: -0.02em;
+    }
+
+    .sub {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .home-auth-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .home-auth-grid input {
+      flex: 1 1 280px;
+      min-width: 220px;
+    }
+
+    .home-auth-grid button {
+      flex: 0 0 auto;
+      min-width: 120px;
+    }
+
+    .home-status-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .card {
+      border: 1px solid #c9d9e2;
+      border-radius: var(--radius-md);
+      background: #fff;
+      padding: 14px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .card h2 {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: -0.02em;
+    }
+
+    .steps {
+      margin: 0;
+      padding-left: 18px;
+      display: grid;
+      gap: 6px;
+      color: #2f4758;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .contact {
+      font-size: 15px;
+      line-height: 1.5;
+      color: #1e3546;
+      font-weight: 600;
+    }
+
+    @media (max-width: 860px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .home-auth-grid button {
+        flex: 1 1 100%;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="/assets/kmm-theme.css" />
+</head>
+<body class="page-home">
+<div class="app">
+  <header class="panel top">
+    <div class="nav">
+      <div class="brand">
+        <div class="brand-mark">KM</div>
+        <span>KOREATECH MAJOR MEETING</span>
+      </div>
+      <nav class="nav-links">
+        <a href="/feed.html">매칭보드</a>
+        <a href="/chat.html">쪽지함</a>
+        <a id="navSignupLink" href="/signup.html">회원가입</a>
+        <a id="navAccountLink" href="/account.html" hidden>계정</a>
+      </nav>
+    </div>
+
+    <div>
+      <h1>한기대 과팅 매칭 서비스</h1>
+      <p class="sub">회원가입/인증 후 매칭 글을 올리고, 쪽지함에서 대화를 시작하세요. 기능은 페이지별로 분리되어 있고, 필요한 작업만 각 페이지에서 수행하도록 구성했습니다.</p>
+    </div>
+
+    <div id="guestAuth" class="home-auth-grid">
+      <input id="loginEmail" type="email" placeholder="이메일" />
+      <input id="loginPassword" type="password" placeholder="비밀번호" />
+      <button id="loginBtn">로그인</button>
+      <button id="gotoSignupBtn" class="ghost">회원가입</button>
+    </div>
+
+    <div id="memberAuth" class="home-status-row" hidden>
+      <span id="profileChip" class="chip">내 정보: -</span>
+      <button id="logoutBtn" class="ghost">로그아웃</button>
+    </div>
+  </header>
+
+  <section class="panel" style="padding:16px;">
+    <div class="grid">
+      <article class="card">
+        <h2>사용 방법</h2>
+        <ol class="steps">
+          <li>`회원가입` 페이지에서 가입 후, `계정` 페이지에서 이메일 인증/학생증 인증을 진행합니다.</li>
+          <li>`매칭보드` 페이지에서 모집글을 작성하거나, 다른 모집글에 쪽지를 보냅니다.</li>
+          <li>`쪽지함` 페이지에서 내 채팅방 목록을 보고, 원하는 방을 눌러 대화로 이동합니다.</li>
+          <li>채팅은 `채팅방` 전용 페이지에서만 진행됩니다.</li>
+        </ol>
+      </article>
+
+      <article class="card">
+        <h2>문의 / 문제 신고</h2>
+        <p class="contact">서비스 사용 중 문제 있으면 인스타그램 <strong>srsxb10_</strong> 으로 연락 주세요.</p>
+        <p class="sub" style="margin:0;">가능하면 문제 화면 캡처와 재현 순서를 같이 보내주면 더 빠르게 처리할 수 있습니다.</p>
+      </article>
+    </div>
+  </section>
+</div>
+<script>
+  const MAJOR_LABELS = {
+    MECHANICAL: "기계공학부",
+    MECHATRONICS: "메카트로닉스공학부",
+    ELECTRICAL_ELECTRONICS_COMMUNICATION: "전기·전자·통신공학부",
+    COMPUTER_SCIENCE: "컴퓨터공학부",
+    DESIGN: "디자인공학부",
+    ENERGY_MATERIALS_CHEMICAL: "에너지신소재화학공학부",
+    INDUSTRIAL_MANAGEMENT: "산업경영학부",
+    EMPLOYMENT_SERVICES: "고용서비스정책학과"
+  };
+
+  const state = { me: null };
+  const $ = (id) => document.getElementById(id);
+
+  function majorLabel(major) {
+    return MAJOR_LABELS[major] || major || "-";
+  }
+
+  function normalizeErrorPayload(status, payload, rawText) {
+    if (payload && payload.error) {
+      return {
+        status,
+        code: payload.error.code || "UNKNOWN",
+        message: payload.error.message || "요청 실패"
+      };
+    }
+    return {
+      status,
+      code: "HTTP_" + status,
+      message: rawText || "요청 실패"
+    };
+  }
+
+  async function api(path, options = {}) {
+    const method = options.method || "GET";
+    const requestOptions = {
+      method,
+      cache: "no-store",
+      credentials: "same-origin",
+      headers: options.headers ? { ...options.headers } : {}
+    };
+
+    if (options.body !== undefined && options.body !== null) {
+      requestOptions.headers["Content-Type"] = "application/json";
+      requestOptions.body = JSON.stringify(options.body);
+    }
+
+    const response = await fetch(path, requestOptions);
+    const rawText = await response.text();
+    let payload = null;
+
+    if (rawText) {
+      try {
+        payload = JSON.parse(rawText);
+      } catch (_) {
+        payload = null;
+      }
+    }
+
+    if (!response.ok) {
+      throw normalizeErrorPayload(response.status, payload, rawText);
+    }
+
+    if (!payload) return null;
+    if (payload.success === false) {
+      throw normalizeErrorPayload(response.status, payload, rawText);
+    }
+    return payload.data;
+  }
+
+  function refreshAuthUi() {
+    const guestAuth = $("guestAuth");
+    const memberAuth = $("memberAuth");
+    const profileChip = $("profileChip");
+    const navSignupLink = $("navSignupLink");
+    const navAccountLink = $("navAccountLink");
+
+    if (!state.me) {
+      guestAuth.hidden = false;
+      memberAuth.hidden = true;
+      navSignupLink.hidden = false;
+      navAccountLink.hidden = true;
+      return;
+    }
+
+    guestAuth.hidden = true;
+    memberAuth.hidden = false;
+    navSignupLink.hidden = true;
+    navAccountLink.hidden = false;
+    profileChip.textContent = `${state.me.nickname || state.me.name} | ${majorLabel(state.me.major)}`;
+  }
+
+  async function loadMe() {
+    try {
+      state.me = await api("/api/v1/users/me");
+    } catch (_) {
+      state.me = null;
+    }
+    refreshAuthUi();
+  }
+
+  async function login() {
+    try {
+      await api("/api/v1/auth/login", {
+        method: "POST",
+        body: {
+          email: $("loginEmail").value.trim(),
+          password: $("loginPassword").value
+        }
+      });
+      await loadMe();
+    } catch (error) {
+      await loadMe();
+      alert(`로그인 실패: ${error.message}`);
+    }
+  }
+
+  async function logout() {
+    try {
+      await api("/api/v1/auth/logout", { method: "POST" });
+    } catch (_) {
+    }
+    await loadMe();
+  }
+
+  $("loginBtn").addEventListener("click", login);
+  $("gotoSignupBtn").addEventListener("click", () => window.location.assign("/signup.html"));
+  $("logoutBtn").addEventListener("click", logout);
+  $("loginPassword").addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      login();
+    }
+  });
+
+  loadMe();
+</script>
+</body>
+</html>

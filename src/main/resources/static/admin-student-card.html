@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KOREATECH 관리자 센터</title>
+  <style>
+    @import url("https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css");
+
+    :root {
+      --bg: #eef4f8;
+      --ink: #102839;
+      --muted: #4b6577;
+      --line: #c6d7e2;
+      --panel: #ffffff;
+      --brand: #005c8b;
+      --brand-2: #1288a3;
+      --danger: #b72d2d;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --radius-sm: 9px;
+      --shadow: 0 14px 32px rgba(4, 39, 58, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      color: var(--ink);
+      font-family: "SUIT", "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+      background:
+        radial-gradient(circle at 10% 8%, #d8ecff 0%, transparent 35%),
+        radial-gradient(circle at 88% 12%, #d8efe8 0%, transparent 38%),
+        var(--bg);
+      padding: 12px;
+    }
+
+    .wrap {
+      width: min(1280px, 100%);
+      margin: 0 auto;
+      display: grid;
+      gap: 10px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      padding: 12px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 26px;
+      letter-spacing: -0.02em;
+    }
+
+    .sub {
+      margin: 6px 0 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    input, select, textarea, button, a.btn {
+      font: inherit;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      min-height: 40px;
+      border: 1px solid #c3d4de;
+      border-radius: var(--radius-sm);
+      background: #fff;
+      color: var(--ink);
+      padding: 9px 10px;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px rgba(0, 92, 139, 0.12);
+    }
+
+    button, a.btn {
+      border: none;
+      border-radius: var(--radius-sm);
+      min-height: 40px;
+      padding: 9px 11px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+      text-decoration: none;
+      text-align: center;
+      background: linear-gradient(100deg, var(--brand), var(--brand-2));
+      transition: transform .12s ease, filter .16s ease;
+    }
+
+    button:hover, a.btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.04);
+    }
+
+    button.secondary { background: #354a5c; }
+    button.danger { background: var(--danger); }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto auto auto;
+      gap: 8px;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .token-bar {
+      margin-top: 8px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .state {
+      margin-top: 10px;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .state.ok { color: #107a58; }
+    .state.bad { color: #ab2d2d; }
+
+    .tools {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .tools a {
+      text-decoration: none;
+      color: #184c69;
+      border: 1px solid #c2d4de;
+      border-radius: 999px;
+      background: #f6fbff;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .table-wrap {
+      margin-top: 10px;
+      border: 1px solid #c8d8e2;
+      border-radius: 12px;
+      overflow: auto;
+      max-height: 520px;
+      background: #fff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    th, td {
+      white-space: nowrap;
+      text-align: left;
+      padding: 8px 9px;
+      border-bottom: 1px solid #edf2f7;
+      vertical-align: top;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #f7fbff;
+      color: #2f4c5c;
+      font-size: 11px;
+    }
+
+    .cell-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .log {
+      min-height: 180px;
+      max-height: 280px;
+      overflow: auto;
+      border: 1px solid #1f3340;
+      border-radius: 10px;
+      background: #0e1b24;
+      color: #d8e4ea;
+      padding: 9px;
+      font-family: "JetBrains Mono", "D2Coding", "Consolas", monospace;
+      font-size: 11px;
+      white-space: pre-wrap;
+    }
+
+    @media (max-width: 960px) {
+      .toolbar { grid-template-columns: 1fr; }
+      .token-bar { grid-template-columns: 1fr; }
+    }
+  </style>
+  <link rel="stylesheet" href="/assets/kmm-theme.css" />
+</head>
+<body class="page-admin">
+<div class="wrap">
+  <section class="panel">
+    <h1>관리자 센터</h1>
+    <p class="sub">학생증 인증 요청 처리 및 운영 도구 접근 화면입니다. 사용자 화면에는 노출되지 않습니다.</p>
+
+    <div class="toolbar">
+      <input id="adminEmailInput" placeholder="관리자 이메일" />
+      <input id="adminPasswordInput" type="password" placeholder="관리자 비밀번호" />
+      <button onclick="adminLogin()">관리자 로그인</button>
+      <button class="secondary" onclick="adminLogout()">로그아웃</button>
+      <a class="btn" href="/">사용자 홈</a>
+    </div>
+
+    <div class="token-bar">
+      <input id="adminTokenInput" placeholder="(선택) 관리자 JWT 토큰 직접 입력" />
+      <button class="secondary" onclick="saveTokenAndCheck()">토큰 저장 + 권한 확인</button>
+    </div>
+
+    <div id="adminState" class="state bad">권한 미확인</div>
+
+    <div class="tools">
+      <a href="/db-viewer.html">DB Viewer</a>
+      <a href="/h2-console" target="_blank" rel="noopener">H2 Console</a>
+      <a href="/chat.html">채팅 화면</a>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+      <select id="statusFilter" style="max-width:220px;">
+        <option value="" selected>전체 (ALL)</option>
+        <option value="PENDING">대기중 (PENDING)</option>
+        <option value="APPROVED">승인됨 (APPROVED)</option>
+        <option value="REJECTED">반려됨 (REJECTED)</option>
+      </select>
+      <button onclick="loadRequests()">목록 새로고침</button>
+      <button class="secondary" onclick="clearLog()">로그 지우기</button>
+    </div>
+
+    <div class="table-wrap">
+      <table id="pendingTable">
+        <thead>
+        <tr>
+          <th>requestId</th>
+          <th>userId</th>
+          <th>email</th>
+          <th>name</th>
+          <th>studentNumber</th>
+          <th>major</th>
+          <th>status</th>
+          <th>rejectReason</th>
+          <th>submittedAt</th>
+          <th>reviewedAt</th>
+          <th>actions</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h3 style="margin:0 0 8px;">운영 로그</h3>
+    <div id="log" class="log"></div>
+  </section>
+</div>
+
+<script>
+  const adminTokenInput = document.getElementById("adminTokenInput");
+  const adminEmailInput = document.getElementById("adminEmailInput");
+  const adminPasswordInput = document.getElementById("adminPasswordInput");
+  const adminState = document.getElementById("adminState");
+  const logEl = document.getElementById("log");
+  const statusFilter = document.getElementById("statusFilter");
+  const pendingTableBody = document.querySelector("#pendingTable tbody");
+
+  let adminToken = localStorage.getItem("ktmatch_admin_token") || localStorage.getItem("ktmatch_access_token") || "";
+  adminTokenInput.value = adminToken;
+  adminEmailInput.value = "admin@koreatech.ac.kr";
+
+  function pushLog(label, value) {
+    const now = new Date().toLocaleTimeString();
+    const text = typeof value === "string" ? value : JSON.stringify(value, null, 2);
+    logEl.textContent = `[${now}] ${label}\n${text}\n\n` + logEl.textContent;
+  }
+
+  function clearLog() {
+    logEl.textContent = "";
+  }
+
+  async function callAdminApi(method, url, body) {
+    const headers = {};
+    const options = { method, headers, credentials: "same-origin" };
+
+    if (adminToken) {
+      headers["Authorization"] = `Bearer ${adminToken}`;
+    }
+
+    if (body !== undefined && body !== null) {
+      headers["Content-Type"] = "application/json";
+      options.body = JSON.stringify(body);
+    }
+
+    pushLog(`REQUEST ${method} ${url}`, body || {});
+    const response = await fetch(url, options);
+
+    let json = null;
+    try {
+      json = await response.json();
+    } catch (_) {
+      json = { message: "JSON 응답 아님" };
+    }
+
+    pushLog(`RESPONSE ${response.status} ${url}`, json);
+    return { response, json };
+  }
+
+  async function checkAdminRole() {
+    try {
+      const { response, json } = await callAdminApi("GET", "/api/v1/users/me");
+      if (!response.ok || !json?.success) {
+        adminState.className = "state bad";
+        adminState.textContent = "권한 확인 실패";
+        return false;
+      }
+
+      if (json.data.role !== "ADMIN") {
+        adminState.className = "state bad";
+        adminState.textContent = `접근 거부: 현재 role=${json.data.role}`;
+        return false;
+      }
+
+      adminState.className = "state ok";
+      adminState.textContent = `ADMIN 확인 완료 (${json.data.email})`;
+      return true;
+    } catch (e) {
+      adminState.className = "state bad";
+      adminState.textContent = "권한 확인 예외";
+      pushLog("CLIENT ERROR", e.message);
+      return false;
+    }
+  }
+
+  async function saveTokenAndCheck() {
+    adminToken = adminTokenInput.value.trim();
+    localStorage.setItem("ktmatch_admin_token", adminToken);
+    await checkAdminRole();
+  }
+
+  async function adminLogin() {
+    const email = adminEmailInput.value.trim();
+    const password = adminPasswordInput.value;
+    const body = { email, password };
+    pushLog("REQUEST POST /api/v1/auth/login", body);
+    const response = await fetch("/api/v1/auth/login", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+
+    let json = null;
+    try {
+      json = await response.json();
+    } catch (_) {
+      json = { message: "JSON 응답 아님" };
+    }
+
+    pushLog(`RESPONSE ${response.status} /api/v1/auth/login`, json);
+    if (response.ok && json?.success && json?.data?.accessToken) {
+      adminToken = json.data.accessToken;
+      adminTokenInput.value = adminToken;
+      localStorage.setItem("ktmatch_admin_token", adminToken);
+      await checkAdminRole();
+      await loadRequests();
+    }
+  }
+
+  async function adminLogout() {
+    pushLog("REQUEST POST /api/v1/auth/logout", {});
+    const response = await fetch("/api/v1/auth/logout", {
+      method: "POST",
+      credentials: "same-origin"
+    });
+    let json = null;
+    try {
+      json = await response.json();
+    } catch (_) {
+      json = { message: "JSON 응답 아님" };
+    }
+    pushLog(`RESPONSE ${response.status} /api/v1/auth/logout`, json);
+
+    adminToken = "";
+    adminTokenInput.value = "";
+    localStorage.removeItem("ktmatch_admin_token");
+    adminState.className = "state bad";
+    adminState.textContent = "로그아웃됨";
+    renderPendingRows([]);
+  }
+
+  function renderPendingRows(rows) {
+    pendingTableBody.innerHTML = "";
+
+    if (!rows || rows.length === 0) {
+      const tr = document.createElement("tr");
+      const td = document.createElement("td");
+      td.colSpan = 11;
+      td.textContent = "조건에 맞는 요청이 없습니다.";
+      tr.appendChild(td);
+      pendingTableBody.appendChild(tr);
+      return;
+    }
+
+    rows.forEach((row) => {
+      const tr = document.createElement("tr");
+      const fields = [
+        row.requestId,
+        row.userId,
+        row.userEmail,
+        row.userName,
+        row.studentNumber,
+        row.major,
+        row.status,
+        row.rejectReason,
+        row.submittedAt,
+        row.reviewedAt
+      ];
+
+      fields.forEach((value) => {
+        const td = document.createElement("td");
+        td.textContent = value ?? "";
+        tr.appendChild(td);
+      });
+
+      const actionTd = document.createElement("td");
+      const wrap = document.createElement("div");
+      wrap.className = "cell-actions";
+
+      const viewBtn = document.createElement("button");
+      viewBtn.className = "secondary";
+      viewBtn.textContent = "이미지";
+      viewBtn.onclick = () => openImage(row.requestId);
+
+      const approveBtn = document.createElement("button");
+      approveBtn.textContent = "승인";
+      approveBtn.onclick = async () => {
+        await approve(row.requestId);
+        await loadRequests();
+      };
+
+      const rejectBtn = document.createElement("button");
+      rejectBtn.className = "danger";
+      rejectBtn.textContent = "반려";
+      rejectBtn.onclick = async () => {
+        const reason = prompt("반려 사유를 입력하세요", "학생증 정보 확인 불가");
+        if (!reason) return;
+        await reject(row.requestId, reason);
+        await loadRequests();
+      };
+
+      wrap.appendChild(viewBtn);
+      if (row.status === "PENDING") {
+        wrap.appendChild(approveBtn);
+        wrap.appendChild(rejectBtn);
+      }
+      actionTd.appendChild(wrap);
+      tr.appendChild(actionTd);
+
+      pendingTableBody.appendChild(tr);
+    });
+  }
+
+  async function loadRequests() {
+    const isAdmin = await checkAdminRole();
+    if (!isAdmin) {
+      renderPendingRows([]);
+      return;
+    }
+
+    const status = statusFilter.value;
+    const url = status
+      ? `/api/v1/admin/student-cards?status=${encodeURIComponent(status)}`
+      : "/api/v1/admin/student-cards";
+
+    const { response, json } = await callAdminApi("GET", url);
+    if (!response.ok || !json?.success) return;
+    renderPendingRows(json.data);
+  }
+
+  async function approve(requestId) {
+    await callAdminApi("POST", `/api/v1/admin/student-cards/${requestId}/approve`);
+  }
+
+  async function reject(requestId, reason) {
+    await callAdminApi("POST", `/api/v1/admin/student-cards/${requestId}/reject`, { reason });
+  }
+
+  async function openImage(requestId) {
+    const url = `/api/v1/admin/student-cards/${requestId}/image`;
+    pushLog(`REQUEST GET ${url}`, {});
+
+    const headers = {};
+    if (adminToken) {
+      headers["Authorization"] = `Bearer ${adminToken}`;
+    }
+
+    const response = await fetch(url, {
+      method: "GET",
+      credentials: "same-origin",
+      headers
+    });
+
+    if (!response.ok) {
+      let json = null;
+      try {
+        json = await response.json();
+      } catch (_) {
+        json = { message: "이미지 조회 실패" };
+      }
+      pushLog(`RESPONSE ${response.status} ${url}`, json);
+      return;
+    }
+
+    const blob = await response.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    window.open(objectUrl, "_blank");
+    pushLog(`RESPONSE ${response.status} ${url}`, { opened: true, size: blob.size });
+  }
+
+  checkAdminRole().then((isAdmin) => {
+    if (isAdmin) {
+      loadRequests();
+    }
+  });
+</script>
+</body>
+</html>

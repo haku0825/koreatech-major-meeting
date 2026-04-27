@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KTMatch H2 DB Viewer</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --line: #dbe4ef;
+      --ink: #111827;
+      --muted: #4b5563;
+      --accent: #2563eb;
+      --accent-2: #1d4ed8;
+    }
+
+    * { box-sizing: border-box; }
+  
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "SUIT", "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 10%, #dbeafe 0%, transparent 35%),
+        radial-gradient(circle at 92% 16%, #e0e7ff 0%, transparent 34%),
+        var(--bg);
+      padding: 20px;
+    }
+
+    .wrap {
+      width: min(1200px, 100%);
+      margin: 0 auto;
+      display: grid;
+      gap: 14px;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+    }
+
+    h1 { margin: 0 0 6px; font-size: 28px; }
+    .sub { margin: 0 0 12px; color: var(--muted); }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    button, a.btn {
+      border: none;
+      border-radius: 10px;
+      padding: 9px 12px;
+      color: white;
+      text-decoration: none;
+      cursor: pointer;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      font-size: 13px;
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+    }
+
+    .meta-card {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px;
+      background: #fcfdff;
+    }
+
+    .label { font-size: 12px; color: var(--muted); }
+    .value { font-size: 18px; font-weight: 700; }
+
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      max-height: 340px;
+      background: white;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th, td {
+      border-bottom: 1px solid #edf2f7;
+      padding: 8px 10px;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #f8fbff;
+      font-size: 12px;
+      color: #334155;
+    }
+
+    .mono {
+      font-family: "JetBrains Mono", "D2Coding", "Consolas", monospace;
+      font-size: 12px;
+    }
+  </style>
+  <link rel="stylesheet" href="/assets/kmm-theme.css" />
+</head>
+<body class="page-admin">
+<div class="wrap">
+  <section class="panel">
+    <h1>H2 데이터베이스 뷰어</h1>
+    <p class="sub">현재 메모리 DB의 `users`, `withdrawn_users`, `posts`, `email_verifications`, `student_card_verifications`, `chat_rooms`, `chat_messages` 테이블을 조회합니다.</p>
+    <div class="toolbar">
+      <button onclick="refreshAll()">새로고침</button>
+      <a class="btn" href="/h2-console" target="_blank" rel="noreferrer">H2 Console 열기</a>
+      <a class="btn" href="/">홈으로</a>
+    </div>
+    <p class="sub mono" style="margin-top:8px;">
+      H2 Console JDBC URL: jdbc:h2:mem:koreatech-major-meeting / user: sa / password: (empty)
+    </p>
+  </section>
+
+  <section class="panel">
+    <div class="meta">
+      <div class="meta-card">
+        <div class="label">Users</div>
+        <div class="value" id="userCount">-</div>
+      </div>
+      <div class="meta-card">
+        <div class="label">Withdrawn Users</div>
+        <div class="value" id="withdrawnUserCount">-</div>
+      </div>
+      <div class="meta-card">
+        <div class="label">Email Verifications</div>
+        <div class="value" id="verificationCount">-</div>
+      </div>
+      <div class="meta-card">
+        <div class="label">Student Card Verifications</div>
+        <div class="value" id="studentCardVerificationCount">-</div>
+      </div>
+      <div class="meta-card">
+        <div class="label">Posts</div>
+        <div class="value" id="postCount">-</div>
+      </div>
+      <div class="meta-card">
+        <div class="label">Chat Rooms</div>
+        <div class="value" id="chatRoomCount">-</div>
+      </div>
+      <div class="meta-card">
+        <div class="label">Chat Messages</div>
+        <div class="value" id="chatMessageCount">-</div>
+      </div>
+      <div class="meta-card">
+        <div class="label">Last Checked</div>
+        <div class="value mono" id="checkedAt">-</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h3 style="margin-top:0;">users</h3>
+    <div class="table-wrap">
+      <table id="usersTable">
+        <thead>
+        <tr>
+          <th>id</th><th>email</th><th>name</th><th>nickname</th><th>birthYear</th><th>studentNumber</th><th>major</th><th>role</th><th>emailVerified</th><th>studentCardVerified</th><th>createdAt</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h3 style="margin-top:0;">withdrawn_users</h3>
+    <div class="table-wrap">
+      <table id="withdrawnUsersTable">
+        <thead>
+        <tr>
+          <th>id</th><th>userId</th><th>name</th><th>studentNumber</th><th>reason</th><th>withdrawnAt</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h3 style="margin-top:0;">posts</h3>
+    <div class="table-wrap">
+      <table id="postsTable">
+        <thead>
+        <tr>
+          <th>id</th><th>writerUserId</th><th>totalMemberCount</th><th>introduction</th><th>status</th><th>memberProfiles</th><th>createdAt</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h3 style="margin-top:0;">email_verifications</h3>
+    <div class="table-wrap">
+      <table id="verificationTable">
+        <thead>
+        <tr>
+          <th>id</th><th>email</th><th>code</th><th>verified</th><th>expiresAt</th><th>createdAt</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h3 style="margin-top:0;">student_card_verifications</h3>
+    <div class="table-wrap">
+      <table id="studentCardVerificationTable">
+        <thead>
+        <tr>
+          <th>id</th><th>userId</th><th>status</th><th>originalFileName</th><th>storedFileName</th><th>rejectReason</th><th>submittedAt</th><th>reviewedAt</th><th>reviewedByUserId</th><th>createdAt</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h3 style="margin-top:0;">chat_rooms</h3>
+    <div class="table-wrap">
+      <table id="chatRoomsTable">
+        <thead>
+        <tr>
+          <th>id</th><th>postId</th><th>requesterUserId</th><th>postWriterUserId</th><th>createdAt</th><th>updatedAt</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h3 style="margin-top:0;">chat_messages</h3>
+    <div class="table-wrap">
+      <table id="chatMessagesTable">
+        <thead>
+        <tr>
+          <th>id</th><th>roomId</th><th>senderUserId</th><th>content</th><th>createdAt</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<script>
+  async function getJson(url) {
+    const res = await fetch(url);
+    return await res.json();
+  }
+
+  function renderRows(tableId, rows, keys) {
+    const tbody = document.querySelector(`#${tableId} tbody`);
+    tbody.innerHTML = "";
+    rows.forEach((row) => {
+      const tr = document.createElement("tr");
+      keys.forEach((key) => {
+        const td = document.createElement("td");
+        td.textContent = row[key] ?? "";
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+  }
+
+  async function refreshAll() {
+    const summary = await getJson("/api/v1/dev/db/summary");
+    const users = await getJson("/api/v1/dev/db/users");
+    const withdrawnUsers = await getJson("/api/v1/dev/db/withdrawn-users");
+    const posts = await getJson("/api/v1/dev/db/posts");
+    const verifications = await getJson("/api/v1/dev/db/email-verifications");
+    const studentCardVerifications = await getJson("/api/v1/dev/db/student-card-verifications");
+    const chatRooms = await getJson("/api/v1/dev/db/chat-rooms");
+    const chatMessages = await getJson("/api/v1/dev/db/chat-messages");
+
+    document.getElementById("userCount").textContent = summary.data.userCount;
+    document.getElementById("withdrawnUserCount").textContent = summary.data.withdrawnUserCount;
+    document.getElementById("verificationCount").textContent = summary.data.emailVerificationCount;
+    document.getElementById("studentCardVerificationCount").textContent = summary.data.studentCardVerificationCount;
+    document.getElementById("postCount").textContent = summary.data.postCount;
+    document.getElementById("chatRoomCount").textContent = summary.data.chatRoomCount;
+    document.getElementById("chatMessageCount").textContent = summary.data.chatMessageCount;
+    document.getElementById("checkedAt").textContent = summary.data.checkedAt;
+
+    renderRows("usersTable", users.data, [
+      "id", "email", "name", "nickname", "birthYear", "studentNumber", "major", "role", "emailVerified", "studentCardVerified", "createdAt"
+    ]);
+    renderRows("withdrawnUsersTable", withdrawnUsers.data, [
+      "id", "userId", "name", "studentNumber", "reason", "withdrawnAt"
+    ]);
+    renderRows("postsTable", posts.data, [
+      "id", "writerUserId", "totalMemberCount", "introduction", "status", "memberProfiles", "createdAt"
+    ]);
+    renderRows("verificationTable", verifications.data, [
+      "id", "email", "code", "verified", "expiresAt", "createdAt"
+    ]);
+    renderRows("studentCardVerificationTable", studentCardVerifications.data, [
+      "id", "userId", "status", "originalFileName", "storedFileName", "rejectReason", "submittedAt", "reviewedAt", "reviewedByUserId", "createdAt"
+    ]);
+    renderRows("chatRoomsTable", chatRooms.data, [
+      "id", "postId", "requesterUserId", "postWriterUserId", "createdAt", "updatedAt"
+    ]);
+    renderRows("chatMessagesTable", chatMessages.data, [
+      "id", "roomId", "senderUserId", "content", "createdAt"
+    ]);
+  }
+
+  refreshAll();
+</script>
+</body>
+</html>

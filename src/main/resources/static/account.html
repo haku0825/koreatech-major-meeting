@@ -1,0 +1,673 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KOREATECH 계정 센터</title>
+  <style>
+    @import url("https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css");
+
+    :root {
+      --bg: #f2f7fb;
+      --ink: #0f2431;
+      --muted: #4e6574;
+      --line: #cbdae4;
+      --panel: #ffffff;
+      --brand: #00588a;
+      --brand-2: #007f9f;
+      --ok: #0f8d5f;
+      --bad: #ac2d2d;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+      --shadow: 0 16px 36px rgba(3, 38, 58, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      color: var(--ink);
+      font-family: "SUIT", "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+      background:
+        radial-gradient(circle at 12% 8%, #d8ecff 0%, transparent 35%),
+        radial-gradient(circle at 88% 14%, #d7f0e8 0%, transparent 38%),
+        var(--bg);
+    }
+
+    .app {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+    }
+
+    .top {
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .top-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .top h1 {
+      margin: 0;
+      font-size: clamp(24px, 3vw, 34px);
+    }
+
+    .top p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .login-box {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .hidden { display: none !important; }
+
+    .status-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid #c5d5de;
+      background: #f6fbff;
+      color: #365061;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+    }
+
+    .chip.ok { border-color: #84debd; background: #ecfff7; color: var(--ok); }
+    .chip.bad { border-color: #edb0b0; background: #fff3f3; color: var(--bad); }
+
+    input, select, textarea, button { font: inherit; }
+
+    input, select, textarea {
+      width: 100%;
+      min-height: 42px;
+      border: 1px solid #c4d3dc;
+      border-radius: var(--radius-sm);
+      padding: 10px 11px;
+      background: #fff;
+      color: var(--ink);
+      outline: none;
+    }
+
+    button {
+      border: none;
+      border-radius: var(--radius-sm);
+      min-height: 42px;
+      padding: 10px 12px;
+      cursor: pointer;
+      font-weight: 800;
+      color: #fff;
+      background: linear-gradient(100deg, var(--brand), var(--brand-2));
+    }
+
+    button.ghost { background: #36495a; }
+    button.danger { background: #ba2d2d; }
+
+    .account {
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .section-head p {
+      margin: 4px 0 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .account-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .card {
+      border: 1px solid #c9d9e2;
+      border-radius: var(--radius-md);
+      background: #fff;
+      padding: 11px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .card h3 {
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .card p {
+      margin: 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .auth-required-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+      background: rgba(7, 24, 36, 0.58);
+      z-index: 1300;
+    }
+
+    .auth-required-modal.open { display: flex; }
+
+    .auth-required-card {
+      width: min(420px, 100%);
+      border: 1px solid #c3d4dd;
+      border-radius: 16px;
+      background: #fff;
+      padding: 16px;
+      display: grid;
+      gap: 10px;
+      text-align: center;
+    }
+
+    .auth-required-card h3 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .auth-required-card p {
+      margin: 0;
+      color: #496272;
+      font-size: 13px;
+    }
+
+    @media (max-width: 980px) {
+      .account-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 760px) {
+      .login-box { grid-template-columns: 1fr; }
+      .section-head { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+  <link rel="stylesheet" href="/assets/kmm-theme.css" />
+</head>
+<body class="page-account">
+<div class="app">
+  <header class="panel top">
+    <div class="top-head">
+      <div>
+        <h1>계정 센터</h1>
+        <p>이메일/학생증 인증, 프로필 관리</p>
+      </div>
+      <button class="ghost" onclick="window.location.assign('/')">홈으로</button>
+    </div>
+
+    <div class="status-row">
+      <span id="profileChip" class="chip">내 정보: -</span>
+    </div>
+  </header>
+
+  <main class="panel account">
+    <div class="section-head">
+      <div>
+        <h2>내 계정 작업</h2>
+        <p>계정 관련 기능만 이 페이지에 배치되어 있습니다.</p>
+      </div>
+      <button id="reloadMeBtn" class="ghost">내 정보 새로고침</button>
+    </div>
+
+    <div class="account-grid">
+      <article class="card">
+        <h3>이메일 인증</h3>
+        <p id="emailCardCaption">인증코드는 서버 콘솔에서 확인</p>
+
+        <div id="emailVerifiedView" class="hidden">
+          <p id="verifiedEmailText">현재 인증 이메일: -</p>
+          <p>학교 이메일은 변경할 수 없습니다.</p>
+        </div>
+
+        <div id="emailVerifyView">
+          <input id="verifyEmail" placeholder="이메일" value="tester@koreatech.ac.kr" />
+          <button id="sendCodeBtn" class="ghost">인증코드 발급</button>
+          <input id="verifyCode" placeholder="인증코드 6자리" />
+          <button id="verifyCodeBtn">인증코드 확인</button>
+        </div>
+      </article>
+
+      <article class="card">
+        <h3>학생증 인증</h3>
+        <p id="studentCardInfoText">업로드 후 관리자 승인 대기 (이미지 파일, 최대 10MB)</p>
+        <div id="studentCardUploadWrap">
+          <input id="studentCardFile" type="file" accept="image/*" />
+          <button id="uploadStudentCardBtn">학생증 업로드</button>
+          <button id="checkStudentCardBtn" class="ghost">학생증 상태 조회</button>
+        </div>
+        <p id="studentCardVerifiedText" class="hidden">학생증 인증 완료 (변경 불가)</p>
+      </article>
+
+      <article class="card">
+        <h3>프로필</h3>
+        <p>실명/닉네임/전공 변경, 계정 삭제</p>
+        <input id="updateName" placeholder="새 이름" />
+        <input id="updateNickname" placeholder="새 닉네임" />
+        <select id="updateMajor"></select>
+        <button id="updateProfileBtn" class="ghost">프로필 수정</button>
+        <input id="deletePassword" type="password" placeholder="탈퇴 확인 비밀번호" />
+        <textarea id="deleteReason" rows="3" placeholder="탈퇴 사유를 입력하세요"></textarea>
+        <button id="deleteAccountBtn" class="danger">회원 탈퇴</button>
+      </article>
+    </div>
+  </main>
+</div>
+
+<div id="authRequiredModal" class="auth-required-modal">
+  <div class="auth-required-card">
+    <h3>로그인이 필요합니다!</h3>
+    <p>이 페이지는 로그인 후 이용할 수 있습니다.</p>
+    <button id="goHomeFromAuthModalBtn" class="ghost">홈 화면 가기</button>
+  </div>
+</div>
+
+<script>
+  const MAJORS = [
+    { value: "MECHANICAL", label: "기계공학부" },
+    { value: "MECHATRONICS", label: "메카트로닉스공학부" },
+    { value: "ELECTRICAL_ELECTRONICS_COMMUNICATION", label: "전기·전자·통신공학부" },
+    { value: "COMPUTER_SCIENCE", label: "컴퓨터공학부" },
+    { value: "DESIGN", label: "디자인공학부" },
+    { value: "ENERGY_MATERIALS_CHEMICAL", label: "에너지신소재화학공학부" },
+    { value: "INDUSTRIAL_MANAGEMENT", label: "산업경영학부" },
+    { value: "EMPLOYMENT_SERVICES", label: "고용서비스정책학과" }
+  ];
+
+  const state = {
+    me: null
+  };
+
+  const MAX_STUDENT_CARD_FILE_SIZE_BYTES = 10 * 1024 * 1024;
+  const STUDENT_CARD_UPLOAD_HINT = "업로드 후 관리자 승인 대기 (이미지 파일, 최대 10MB)";
+
+  const $ = (id) => document.getElementById(id);
+
+  function majorLabel(major) {
+    const found = MAJORS.find((item) => item.value === major);
+    return found ? found.label : (major || "-");
+  }
+
+  function fillMajorSelect(selectEl, selectedValue) {
+    selectEl.innerHTML = MAJORS.map((major) => {
+      const selected = selectedValue === major.value ? "selected" : "";
+      return `<option value="${major.value}" ${selected}>${major.label}</option>`;
+    }).join("");
+  }
+
+  function normalizeErrorPayload(status, payload, rawText) {
+    if (payload && payload.error) {
+      return {
+        status,
+        code: payload.error.code || "UNKNOWN",
+        message: payload.error.message || "요청 실패"
+      };
+    }
+    return {
+      status,
+      code: "HTTP_" + status,
+      message: rawText || "요청 실패"
+    };
+  }
+
+  async function api(path, options = {}) {
+    const method = options.method || "GET";
+    const requestOptions = {
+      method,
+      cache: "no-store",
+      credentials: "same-origin",
+      headers: options.headers ? { ...options.headers } : {}
+    };
+
+    if (options.body !== undefined && options.body !== null) {
+      requestOptions.headers["Content-Type"] = "application/json";
+      requestOptions.body = JSON.stringify(options.body);
+    }
+
+    if (options.formData) {
+      requestOptions.body = options.formData;
+    }
+
+    const response = await fetch(path, requestOptions);
+    const rawText = await response.text();
+    let payload = null;
+
+    if (rawText) {
+      try {
+        payload = JSON.parse(rawText);
+      } catch (_) {
+        payload = null;
+      }
+    }
+
+    if (!response.ok) {
+      throw normalizeErrorPayload(response.status, payload, rawText);
+    }
+
+    if (!payload) return null;
+    if (payload.success === false) {
+      throw normalizeErrorPayload(response.status, payload, rawText);
+    }
+    return payload.data;
+  }
+
+  function refreshHeader() {
+    const profileChip = $("profileChip");
+
+    if (!state.me) {
+      profileChip.textContent = "내 정보: -";
+      return;
+    }
+
+    const yearLabel = state.me.birthYear ? `${String(state.me.birthYear).slice(-2)}년생` : "-년생";
+    profileChip.textContent = `${state.me.nickname || state.me.name} | ${majorLabel(state.me.major)} | ${yearLabel}`;
+  }
+
+  function refreshEmailCard() {
+    const verifyView = $("emailVerifyView");
+    const verifiedView = $("emailVerifiedView");
+    const caption = $("emailCardCaption");
+
+    if (!state.me) {
+      verifyView.classList.remove("hidden");
+      verifiedView.classList.add("hidden");
+      caption.textContent = "인증코드는 서버 콘솔에서 확인";
+      return;
+    }
+
+    const currentEmail = state.me.email || "";
+    $("verifyEmail").value = currentEmail;
+
+    if (state.me.emailVerified) {
+      verifyView.classList.add("hidden");
+      verifiedView.classList.remove("hidden");
+      caption.textContent = "이메일 인증이 완료되었습니다.";
+      $("verifiedEmailText").textContent = `현재 인증 이메일: ${currentEmail}`;
+      return;
+    }
+
+    verifyView.classList.remove("hidden");
+    verifiedView.classList.add("hidden");
+    caption.textContent = "현재 학교 이메일로 인증코드를 확인하세요.";
+  }
+
+  function refreshStudentCardCard() {
+    const uploadWrap = $("studentCardUploadWrap");
+    const verifiedText = $("studentCardVerifiedText");
+    const infoText = $("studentCardInfoText");
+
+    if (!state.me) {
+      uploadWrap.classList.remove("hidden");
+      verifiedText.classList.add("hidden");
+      infoText.textContent = STUDENT_CARD_UPLOAD_HINT;
+      return;
+    }
+
+    if (state.me.studentCardVerified) {
+      uploadWrap.classList.add("hidden");
+      verifiedText.classList.remove("hidden");
+      infoText.textContent = "학생증 인증 완료 상태입니다.";
+      return;
+    }
+
+    uploadWrap.classList.remove("hidden");
+    verifiedText.classList.add("hidden");
+    infoText.textContent = STUDENT_CARD_UPLOAD_HINT;
+  }
+
+  function showAuthRequiredModal() {
+    $("authRequiredModal").classList.add("open");
+  }
+
+  function labelForEmailVerification(verified) {
+    return verified ? "인증 완료" : "미인증";
+  }
+
+  function labelForStudentCardStatus(status) {
+    if (status === "PENDING") return "대기중";
+    if (status === "REJECTED") return "반려됨";
+    if (status === "APPROVED") return "승인됨";
+    return "요청 없음";
+  }
+
+  async function loadMe(silent = false) {
+    try {
+      const me = await api("/api/v1/users/me");
+      state.me = me;
+      $("updateName").value = me.name || "";
+      $("updateNickname").value = me.nickname || "";
+      $("updateMajor").value = me.major || "COMPUTER_SCIENCE";
+      refreshHeader();
+      refreshEmailCard();
+      refreshStudentCardCard();
+      return true;
+    } catch (error) {
+      state.me = null;
+      refreshHeader();
+      refreshEmailCard();
+      refreshStudentCardCard();
+      if (error.status === 401 || error.status === 403) {
+        showAuthRequiredModal();
+      }
+      if (!silent && error.status !== 401 && error.status !== 403) {
+        alert(`내 정보 조회 실패: ${error.message}`);
+      }
+      return false;
+    }
+  }
+
+  async function sendEmailCode() {
+    if (!state.me) {
+      alert("로그인 후 사용할 수 있습니다.");
+      return;
+    }
+
+    try {
+      const email = $("verifyEmail").value.trim();
+      await api("/api/v1/auth/email/send", { method: "POST", body: { email } });
+      alert("인증코드를 발급했습니다. 서버 콘솔 로그를 확인하세요.");
+    } catch (error) {
+      alert(`인증코드 발급 실패: ${error.message}`);
+    }
+  }
+
+  async function verifyEmailCode() {
+    if (!state.me) {
+      alert("로그인 후 사용할 수 있습니다.");
+      return;
+    }
+
+    try {
+      const payload = {
+        email: $("verifyEmail").value.trim(),
+        code: $("verifyCode").value.trim()
+      };
+      await api("/api/v1/auth/email/verify", { method: "POST", body: payload });
+      await loadMe(true);
+      $("verifyCode").value = "";
+      alert("이메일 인증 완료");
+    } catch (error) {
+      alert(`이메일 인증 실패: ${error.message}`);
+    }
+  }
+
+  async function uploadStudentCard() {
+    const fileInput = $("studentCardFile");
+    const file = fileInput.files?.[0];
+    if (!file) {
+      alert("업로드할 학생증 이미지를 선택하세요.");
+      return;
+    }
+
+    if (file.size > MAX_STUDENT_CARD_FILE_SIZE_BYTES) {
+      alert("학생증 이미지 용량은 최대 10MB까지 업로드할 수 있습니다.");
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      await api("/api/v1/users/me/student-card", {
+        method: "POST",
+        formData
+      });
+      alert("학생증 업로드 완료. 관리자 승인 대기 상태입니다.");
+      fileInput.value = "";
+    } catch (error) {
+      alert(`학생증 업로드 실패: ${error.message}`);
+    }
+  }
+
+  async function refreshStudentCardStatus() {
+    try {
+      const status = await api("/api/v1/users/me/student-card/status");
+      const lines = [
+        `이메일 인증: ${labelForEmailVerification(status.emailVerified)}`,
+        `학생증 인증: ${status.studentCardVerified ? "인증 완료" : "미인증"}`,
+        `최근 심사 상태: ${labelForStudentCardStatus(status.latestRequestStatus)}`
+      ];
+      if (status.latestRequestStatus === "REJECTED" && status.rejectReason) {
+        lines.push(`반려 사유: ${status.rejectReason}`);
+      }
+      alert(lines.join("\n"));
+      await loadMe(true);
+    } catch (error) {
+      alert(`학생증 상태 조회 실패: ${error.message}`);
+    }
+  }
+
+  async function updateProfile() {
+    if (!state.me) {
+      alert("로그인 후 수정할 수 있습니다.");
+      return;
+    }
+
+    try {
+      const nickname = $("updateNickname").value.trim();
+      if (!nickname) {
+        alert("닉네임을 입력하세요.");
+        return;
+      }
+      const payload = {
+        name: $("updateName").value.trim(),
+        nickname,
+        major: $("updateMajor").value
+      };
+      const updated = await api("/api/v1/users/me", { method: "PUT", body: payload });
+      state.me = updated;
+      refreshHeader();
+      alert("프로필 수정 완료");
+    } catch (error) {
+      alert(`프로필 수정 실패: ${error.message}`);
+    }
+  }
+
+  async function deleteAccount() {
+    if (!state.me) {
+      alert("로그인 상태가 아닙니다.");
+      return;
+    }
+
+    const ok = confirm("정말 회원 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.");
+    if (!ok) {
+      return;
+    }
+
+    const password = $("deletePassword").value;
+    const reason = $("deleteReason").value.trim();
+    if (!password) {
+      alert("탈퇴 확인 비밀번호를 입력하세요.");
+      return;
+    }
+    if (!reason) {
+      alert("탈퇴 사유를 입력하세요.");
+      return;
+    }
+
+    try {
+      await api("/api/v1/users/me", {
+        method: "DELETE",
+        body: { password, reason }
+      });
+      await api("/api/v1/auth/logout", { method: "POST" });
+      alert("회원 탈퇴 완료");
+      state.me = null;
+      $("deletePassword").value = "";
+      $("deleteReason").value = "";
+      refreshHeader();
+      refreshEmailCard();
+      refreshStudentCardCard();
+      window.location.assign("/");
+    } catch (error) {
+      alert(`회원 탈퇴 실패: ${error.message}`);
+    }
+  }
+
+  async function bootstrap() {
+    fillMajorSelect($("updateMajor"), "COMPUTER_SCIENCE");
+    refreshHeader();
+    refreshEmailCard();
+    refreshStudentCardCard();
+    const loggedIn = await loadMe(true);
+    if (!loggedIn) {
+      showAuthRequiredModal();
+    }
+  }
+
+  $("goHomeFromAuthModalBtn").addEventListener("click", () => window.location.assign("/"));
+  $("sendCodeBtn").addEventListener("click", sendEmailCode);
+  $("verifyCodeBtn").addEventListener("click", verifyEmailCode);
+  $("uploadStudentCardBtn").addEventListener("click", uploadStudentCard);
+  $("checkStudentCardBtn").addEventListener("click", refreshStudentCardStatus);
+  $("reloadMeBtn").addEventListener("click", () => loadMe());
+  $("updateProfileBtn").addEventListener("click", updateProfile);
+  $("deleteAccountBtn").addEventListener("click", deleteAccount);
+
+  bootstrap();
+</script>
+</body>
+</html>
